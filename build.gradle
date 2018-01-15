@@ -11,4 +11,12 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    /**
+     * Lucene
+     */
+    compile group: 'org.apache.lucene', name: 'lucene-core', version: '7.2.1'
+    compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '7.2.1'
+
+
 }
