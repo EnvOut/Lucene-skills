@@ -19,5 +19,14 @@ dependencies {
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: '7.2.1'
     compile group: 'org.apache.lucene', name: 'lucene-queryparser', version: '7.2.1'
 
+    /**
+     * Lombok
+     */
+    provided group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
+    /**
+     * Logging
+     */
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.25'
 }

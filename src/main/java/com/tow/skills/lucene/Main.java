@@ -1,61 +1,44 @@
 package com.tow.skills.lucene;
 
-import org.apache.lucene.analysis.Analyzer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.OffsetAttribute;
 
 import java.io.IOException;
+import java.io.StringReader;
 
+//@Slf4j
 public class Main {
-    public static void main(String[] args) throws IOException, ParseException {
-        Analyzer analyzer = new StandardAnalyzer();
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(Main.class);
+    public static void main(String[] args) throws IOException {
+        StringReader reader = new StringReader("Lucene is mainly used for information retrieval " +
+                "and you can read more about it at lucene.apache.org.");
+        StandardAnalyzer wa = new StandardAnalyzer();
+        TokenStream ts = null;
+        try {
+            ts = wa.tokenStream("field", reader);
+            OffsetAttribute offsetAtt = ts.addAttribute(OffsetAttribute.class);
+            CharTermAttribute termAtt = ts.addAttribute(CharTermAttribute.class);
 
-        Directory directory = new RAMDirectory();
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
+            ts.reset();
 
-        IndexWriter indexWriter = new IndexWriter(directory, config);
-
-        Document doc = new Document();
-        String text = "Lucene is an Information Retrieval library written in Java. Lucene";
-        doc.add(new TextField("Content", text, Field.Store.YES));
-
-        indexWriter.addDocument(doc);
-        indexWriter.close();
-
-        IndexReader indexReader = DirectoryReader.open(directory);
-        IndexSearcher indexSearcher = new IndexSearcher(indexReader);
-
-        QueryParser queryParser = new QueryParser("Content", analyzer);
-        Query query = queryParser.parse("Lucene");
-
-        int hitsPerPage =10;
-        TopDocs docs =indexSearcher.search(query,hitsPerPage);
-        ScoreDoc[] hits = docs.scoreDocs;
-        long end = Math.min(docs.totalHits, hitsPerPage);
-        System.out.println("Total Hits: "+docs.totalHits);
-        System.out.println("Results: ");
-
-        for (int i=0;i<end;i++){
-            Document d = indexSearcher.doc(hits[i].doc);
-            System.out.println("Content: "+d.get("Content"));
+            while (ts.incrementToken()) {
+                String token = termAtt.toString();
+                log.info("[{}]", token);
+                log.info("Token starting offset: {}", offsetAtt.startOffset());
+                log.info(" Token ending offset: {}\n", offsetAtt.endOffset());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (ts != null) {
+                ts.close();
+            }
+            wa.close();
         }
 
-//        System.out.println(indexSearcher.doc(0));
-//        System.out.println(indexSearcher.);
-    }
 
+    }
 }
