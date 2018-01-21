@@ -1,8 +1,11 @@
 package com.tow.skills.lucene;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.index.DirectoryReader;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -18,5 +21,7 @@ public class Main {
         DirectoryReader directoryReader = DirectoryReader.open(directory);
         IndexSearcher indexSearch = new IndexSearcher(directoryReader);
 
+        Query query = new TermQuery(new Term("content", "alpha"));
+        TopDocs topDocs = indexSearch.search(query, 100);
     }
 }
